@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign } from 'hono/jwt'
 import bcrypt from 'bcryptjs'
+import { signupInput } from '@woustachemax/open-st-dash-commons'
 
 export const singninRouter = new Hono<{
   Bindings: {
@@ -23,6 +24,13 @@ singninRouter.post('/signup', async (c) => {
   }).$extends(withAccelerate())
 
   const body = await c.req.json()
+  const { success } = signupInput.safeParse(body);
+  if(!success){
+    c.status(403)
+    return c.json({
+      "check your inputs";
+    })
+  }
   try {
     const hashedPassword = await bcrypt.hash(body.password, 10)
 
